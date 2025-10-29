@@ -1,8 +1,7 @@
-const { InventoryMovement, Part, RepairOrder } = require("../index")
-const { inventoryMovementSchema } = require("../validators/inventory.validator")
+import { InventoryMovement, Part, RepairOrder } from "../src/models/index.js"
 
 // Get all inventory movements
-exports.getAllInventoryMovements = async (req, res) => {
+export const getAllInventoryMovements = async (req, res) => {
   try {
     const { part_id, tipo, referencia_order_id } = req.query
 
@@ -27,7 +26,7 @@ exports.getAllInventoryMovements = async (req, res) => {
 }
 
 // Get movement by ID
-exports.getInventoryMovementById = async (req, res) => {
+export const getInventoryMovementById = async (req, res) => {
   try {
     const movement = await InventoryMovement.findByPk(req.params.id, {
       include: [
@@ -47,41 +46,33 @@ exports.getInventoryMovementById = async (req, res) => {
 }
 
 // Create inventory movement
-exports.createInventoryMovement = async (req, res) => {
+export const createInventoryMovement = async (req, res) => {
   try {
-    const validatedData = inventoryMovementSchema.parse(req.body)
-    const movement = await InventoryMovement.create(validatedData)
+    const movement = await InventoryMovement.create(req.body)
     res.status(201).json(movement)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear movimiento", error: error.message })
   }
 }
 
 // Update inventory movement
-exports.updateInventoryMovement = async (req, res) => {
+export const updateInventoryMovement = async (req, res) => {
   try {
-    const validatedData = inventoryMovementSchema.partial().parse(req.body)
     const movement = await InventoryMovement.findByPk(req.params.id)
 
     if (!movement) {
       return res.status(404).json({ message: "Movimiento no encontrado" })
     }
 
-    await movement.update(validatedData)
+    await movement.update(req.body)
     res.json(movement)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar movimiento", error: error.message })
   }
 }
 
 // Delete inventory movement
-exports.deleteInventoryMovement = async (req, res) => {
+export const deleteInventoryMovement = async (req, res) => {
   try {
     const movement = await InventoryMovement.findByPk(req.params.id)
     if (!movement) {

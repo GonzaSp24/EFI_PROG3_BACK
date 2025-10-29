@@ -1,7 +1,7 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken, isAdmin } = require("../middleware/auth.middleware")
-const { getAllRoles, getRoleById, createRole, updateRole, deleteRole } = require("../controllers/role.controller")
+import { verifyToken, isAdmin } from "../middleware/auth.middleware.js"
+import { getAllRoles, getRoleById, createRole, updateRole, deleteRole } from "../controllers/role.controller.js"
 
 // All routes require authentication
 router.use(verifyToken)
@@ -14,4 +14,4 @@ router.post("/", isAdmin, createRole)
 router.put("/:id", isAdmin, updateRole)
 router.delete("/:id", isAdmin, deleteRole)
 
-module.exports = router
+export default router

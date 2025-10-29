@@ -1,9 +1,8 @@
-const { Customer, User, RepairOrder } = require("../index")
-const { customerSchema } = require("../validators/user.validator")
-const { Op } = require("sequelize")
+import { Customer, User, RepairOrder } from "../src/models/index.js"
+import { Op } from "sequelize"
 
 // Get all customers
-exports.getAllCustomers = async (req, res) => {
+export const getAllCustomers = async (req, res) => {
   try {
     const { search } = req.query
 
@@ -30,7 +29,7 @@ exports.getAllCustomers = async (req, res) => {
 }
 
 // Get customer by ID
-exports.getCustomerById = async (req, res) => {
+export const getCustomerById = async (req, res) => {
   try {
     const customer = await Customer.findByPk(req.params.id, {
       include: [{ model: User, as: "user", attributes: ["id", "name", "email"] }],
@@ -47,7 +46,7 @@ exports.getCustomerById = async (req, res) => {
 }
 
 // Get customer with repair orders
-exports.getCustomerWithOrders = async (req, res) => {
+export const getCustomerWithOrders = async (req, res) => {
   try {
     const customer = await Customer.findByPk(req.params.id, {
       include: [
@@ -72,41 +71,33 @@ exports.getCustomerWithOrders = async (req, res) => {
 }
 
 // Create customer
-exports.createCustomer = async (req, res) => {
+export const createCustomer = async (req, res) => {
   try {
-    const validatedData = customerSchema.parse(req.body)
-    const customer = await Customer.create(validatedData)
+    const customer = await Customer.create(req.body)
     res.status(201).json(customer)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear cliente", error: error.message })
   }
 }
 
 // Update customer
-exports.updateCustomer = async (req, res) => {
+export const updateCustomer = async (req, res) => {
   try {
-    const validatedData = customerSchema.partial().parse(req.body)
     const customer = await Customer.findByPk(req.params.id)
 
     if (!customer) {
       return res.status(404).json({ message: "Cliente no encontrado" })
     }
 
-    await customer.update(validatedData)
+    await customer.update(req.body)
     res.json(customer)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar cliente", error: error.message })
   }
 }
 
 // Delete customer (soft delete)
-exports.deleteCustomer = async (req, res) => {
+export const deleteCustomer = async (req, res) => {
   try {
     const customer = await Customer.findByPk(req.params.id)
     if (!customer) {

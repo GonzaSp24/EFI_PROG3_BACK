@@ -1,9 +1,8 @@
-const { User, Role } = require("../index")
-const { userSchema, updateUserSchema } = require("../validators/user.validator")
-const bcrypt = require("bcrypt")
+import { User, Role } from "../src/models/index.js"
+import bcrypt from "bcrypt"
 
 // Get all users
-exports.getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({
       include: [{ model: Role, as: "role" }],
@@ -17,7 +16,7 @@ exports.getAllUsers = async (req, res) => {
 }
 
 // Get user by ID
-exports.getUserById = async (req, res) => {
+export const getUserById = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id, {
       include: [{ model: Role, as: "role" }],
@@ -33,15 +32,13 @@ exports.getUserById = async (req, res) => {
 }
 
 // Create user
-exports.createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
-    const validatedData = userSchema.parse(req.body)
-
     // Hash password
-    const password_hash = await bcrypt.hash(validatedData.password, 10)
+    const password_hash = await bcrypt.hash(req.body.password, 10)
 
     const user = await User.create({
-      ...validatedData,
+      ...req.body,
       password_hash,
       password: undefined,
     })
@@ -52,30 +49,28 @@ exports.createUser = async (req, res) => {
 
     res.status(201).json(userResponse)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear usuario", error: error.message })
   }
 }
 
 // Update user
-exports.updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   try {
-    const validatedData = updateUserSchema.parse(req.body)
     const user = await User.findByPk(req.params.id)
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" })
     }
 
+    const updateData = { ...req.body }
+
     // Hash password if provided
-    if (validatedData.password) {
-      validatedData.password_hash = await bcrypt.hash(validatedData.password, 10)
-      delete validatedData.password
+    if (updateData.password) {
+      updateData.password_hash = await bcrypt.hash(updateData.password, 10)
+      delete updateData.password
     }
 
-    await user.update(validatedData)
+    await user.update(updateData)
 
     // Return user without password
     const userResponse = user.toJSON()
@@ -83,15 +78,12 @@ exports.updateUser = async (req, res) => {
 
     res.json(userResponse)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar usuario", error: error.message })
   }
 }
 
 // Delete user
-exports.deleteUser = async (req, res) => {
+export const deleteUser = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id)
     if (!user) {
@@ -105,7 +97,7 @@ exports.deleteUser = async (req, res) => {
 }
 
 // Toggle user active status
-exports.toggleUserStatus = async (req, res) => {
+export const toggleUserStatus = async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id)
     if (!user) {

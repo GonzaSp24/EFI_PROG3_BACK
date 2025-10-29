@@ -1,8 +1,7 @@
-const { TestChecklistItem, RepairOrder } = require("../index")
-const { testChecklistItemSchema } = require("../validators/order.validator")
+import { TestChecklistItem, RepairOrder } from "../src/models/index.js"
 
 // Get all test checklist items
-exports.getAllTestChecklistItems = async (req, res) => {
+export const getAllTestChecklistItems = async (req, res) => {
   try {
     const { order_id } = req.query
 
@@ -22,7 +21,7 @@ exports.getAllTestChecklistItems = async (req, res) => {
 }
 
 // Get test checklist item by ID
-exports.getTestChecklistItemById = async (req, res) => {
+export const getTestChecklistItemById = async (req, res) => {
   try {
     const item = await TestChecklistItem.findByPk(req.params.id, {
       include: [{ model: RepairOrder, as: "order" }],
@@ -39,41 +38,33 @@ exports.getTestChecklistItemById = async (req, res) => {
 }
 
 // Create test checklist item
-exports.createTestChecklistItem = async (req, res) => {
+export const createTestChecklistItem = async (req, res) => {
   try {
-    const validatedData = testChecklistItemSchema.parse(req.body)
-    const item = await TestChecklistItem.create(validatedData)
+    const item = await TestChecklistItem.create(req.body)
     res.status(201).json(item)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear item", error: error.message })
   }
 }
 
 // Update test checklist item
-exports.updateTestChecklistItem = async (req, res) => {
+export const updateTestChecklistItem = async (req, res) => {
   try {
-    const validatedData = testChecklistItemSchema.partial().parse(req.body)
     const item = await TestChecklistItem.findByPk(req.params.id)
 
     if (!item) {
       return res.status(404).json({ message: "Item no encontrado" })
     }
 
-    await item.update(validatedData)
+    await item.update(req.body)
     res.json(item)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar item", error: error.message })
   }
 }
 
 // Delete test checklist item
-exports.deleteTestChecklistItem = async (req, res) => {
+export const deleteTestChecklistItem = async (req, res) => {
   try {
     const item = await TestChecklistItem.findByPk(req.params.id)
     if (!item) {

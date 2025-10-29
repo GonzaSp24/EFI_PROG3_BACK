@@ -1,13 +1,13 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const {
+import { verifyToken } from "../middleware/auth.middleware.js"
+import {
   getAllTestChecklistItems,
   getTestChecklistItemById,
   createTestChecklistItem,
   updateTestChecklistItem,
   deleteTestChecklistItem,
-} = require("../controllers/testChecklistItem.controller")
+} from "../controllers/testChecklistItem.controller.js"
 
 router.use(verifyToken)
 
@@ -17,4 +17,4 @@ router.post("/", createTestChecklistItem)
 router.put("/:id", updateTestChecklistItem)
 router.delete("/:id", deleteTestChecklistItem)
 
-module.exports = router
+export default router

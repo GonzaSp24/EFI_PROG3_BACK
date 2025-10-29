@@ -1,9 +1,16 @@
-const { RepairOrder, Customer, Device, User, OrderStatus, OrderHistory, RepairTask, Diagnostic } = require("../index")
-const { repairOrderSchema } = require("../validators/order.validator")
-const { Op } = require("sequelize")
+import {
+  RepairOrder,
+  Customer,
+  Device,
+  User,
+  OrderStatus,
+  OrderHistory,
+  RepairTask,
+  Diagnostic,
+} from "../src/models/index.js"
 
 // Get all repair orders
-exports.getAllRepairOrders = async (req, res) => {
+export const getAllRepairOrders = async (req, res) => {
   try {
     const { customer_id, estado_id, prioridad, tecnico_id } = req.query
 
@@ -31,7 +38,7 @@ exports.getAllRepairOrders = async (req, res) => {
 }
 
 // Get orders by customer (special endpoint as requested)
-exports.getOrdersByCustomer = async (req, res) => {
+export const getOrdersByCustomer = async (req, res) => {
   try {
     const orders = await RepairOrder.findAll({
       where: {
@@ -53,7 +60,7 @@ exports.getOrdersByCustomer = async (req, res) => {
 }
 
 // Get repair order by ID with full details
-exports.getRepairOrderById = async (req, res) => {
+export const getRepairOrderById = async (req, res) => {
   try {
     const order = await RepairOrder.findByPk(req.params.id, {
       include: [
@@ -95,33 +102,28 @@ exports.getRepairOrderById = async (req, res) => {
 }
 
 // Create repair order
-exports.createRepairOrder = async (req, res) => {
+export const createRepairOrder = async (req, res) => {
   try {
-    const validatedData = repairOrderSchema.parse(req.body)
-    const order = await RepairOrder.create(validatedData)
+    const order = await RepairOrder.create(req.body)
 
     // Create initial history entry
     await OrderHistory.create({
       order_id: order.id,
       estado_anterior: null,
-      estado_nuevo: validatedData.estado_id,
-      cambiado_por: validatedData.tecnico_id,
+      estado_nuevo: req.body.estado_id,
+      cambiado_por: req.body.tecnico_id,
       comentario: "Orden creada",
     })
 
     res.status(201).json(order)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear orden", error: error.message })
   }
 }
 
 // Update repair order
-exports.updateRepairOrder = async (req, res) => {
+export const updateRepairOrder = async (req, res) => {
   try {
-    const validatedData = repairOrderSchema.partial().parse(req.body)
     const order = await RepairOrder.findByPk(req.params.id)
 
     if (!order) {
@@ -129,28 +131,25 @@ exports.updateRepairOrder = async (req, res) => {
     }
 
     // If status changed, create history entry
-    if (validatedData.estado_id && validatedData.estado_id !== order.estado_id) {
+    if (req.body.estado_id && req.body.estado_id !== order.estado_id) {
       await OrderHistory.create({
         order_id: order.id,
         estado_anterior: order.estado_id,
-        estado_nuevo: validatedData.estado_id,
+        estado_nuevo: req.body.estado_id,
         cambiado_por: req.user.id,
         comentario: req.body.comentario || "Estado actualizado",
       })
     }
 
-    await order.update(validatedData)
+    await order.update(req.body)
     res.json(order)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar orden", error: error.message })
   }
 }
 
 // Delete repair order (soft delete)
-exports.deleteRepairOrder = async (req, res) => {
+export const deleteRepairOrder = async (req, res) => {
   try {
     const order = await RepairOrder.findByPk(req.params.id)
     if (!order) {
@@ -165,7 +164,7 @@ exports.deleteRepairOrder = async (req, res) => {
 }
 
 // Update order status
-exports.updateOrderStatus = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
     const { estado_id, comentario } = req.body
     const order = await RepairOrder.findByPk(req.params.id)

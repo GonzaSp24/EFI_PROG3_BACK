@@ -1,8 +1,7 @@
-const { Brand, DeviceModel } = require("../index")
-const { brandSchema } = require("../validators/device.validator")
+import { Brand, DeviceModel } from "../src/models/index.js"
 
 // Get all brands
-exports.getAllBrands = async (req, res) => {
+export const getAllBrands = async (req, res) => {
   try {
     const brands = await Brand.findAll({
       order: [["name", "ASC"]],
@@ -14,7 +13,7 @@ exports.getAllBrands = async (req, res) => {
 }
 
 // Get brand by ID with models
-exports.getBrandById = async (req, res) => {
+export const getBrandById = async (req, res) => {
   try {
     const brand = await Brand.findByPk(req.params.id, {
       include: [{ model: DeviceModel, as: "device_models" }],
@@ -29,39 +28,31 @@ exports.getBrandById = async (req, res) => {
 }
 
 // Create brand
-exports.createBrand = async (req, res) => {
+export const createBrand = async (req, res) => {
   try {
-    const validatedData = brandSchema.parse(req.body)
-    const brand = await Brand.create(validatedData)
+    const brand = await Brand.create(req.body)
     res.status(201).json(brand)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear marca", error: error.message })
   }
 }
 
 // Update brand
-exports.updateBrand = async (req, res) => {
+export const updateBrand = async (req, res) => {
   try {
-    const validatedData = brandSchema.parse(req.body)
     const brand = await Brand.findByPk(req.params.id)
     if (!brand) {
       return res.status(404).json({ message: "Marca no encontrada" })
     }
-    await brand.update(validatedData)
+    await brand.update(req.body)
     res.json(brand)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar marca", error: error.message })
   }
 }
 
 // Delete brand
-exports.deleteBrand = async (req, res) => {
+export const deleteBrand = async (req, res) => {
   try {
     const brand = await Brand.findByPk(req.params.id)
     if (!brand) {

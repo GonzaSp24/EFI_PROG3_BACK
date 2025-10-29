@@ -1,8 +1,7 @@
-const { PartCompatibility, Part, DeviceModel } = require("../index")
-const { partCompatibilitySchema } = require("../validators/inventory.validator")
+import { PartCompatibility, Part, DeviceModel } from "../src/models/index.js"
 
 // Get all part compatibilities
-exports.getAllPartCompatibilities = async (req, res) => {
+export const getAllPartCompatibilities = async (req, res) => {
   try {
     const { part_id, device_model_id } = req.query
 
@@ -26,7 +25,7 @@ exports.getAllPartCompatibilities = async (req, res) => {
 }
 
 // Get compatibility by ID
-exports.getPartCompatibilityById = async (req, res) => {
+export const getPartCompatibilityById = async (req, res) => {
   try {
     const compatibility = await PartCompatibility.findByPk(req.params.id, {
       include: [
@@ -46,21 +45,17 @@ exports.getPartCompatibilityById = async (req, res) => {
 }
 
 // Create compatibility
-exports.createPartCompatibility = async (req, res) => {
+export const createPartCompatibility = async (req, res) => {
   try {
-    const validatedData = partCompatibilitySchema.parse(req.body)
-    const compatibility = await PartCompatibility.create(validatedData)
+    const compatibility = await PartCompatibility.create(req.body)
     res.status(201).json(compatibility)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear compatibilidad", error: error.message })
   }
 }
 
 // Delete compatibility
-exports.deletePartCompatibility = async (req, res) => {
+export const deletePartCompatibility = async (req, res) => {
   try {
     const compatibility = await PartCompatibility.findByPk(req.params.id)
     if (!compatibility) {

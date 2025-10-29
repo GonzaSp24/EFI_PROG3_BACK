@@ -1,5 +1,4 @@
-const { Payment, Invoice, PaymentMethod } = require("../index")
-const { paymentSchema } = require("../validators/billing.validator")
+import { Payment, Invoice, PaymentMethod } from "../src/models/index.js"
 
 // Get all payments
 exports.getAllPayments = async (req, res) => {
@@ -46,13 +45,12 @@ exports.getPaymentById = async (req, res) => {
 }
 
 // Create payment
-exports.createPayment = async (req, res) => {
+export const createPayment = async (req, res) => {
   try {
-    const validatedData = paymentSchema.parse(req.body)
-    const payment = await Payment.create(validatedData)
+    const payment = await Payment.create(req.body)
 
     // Check if invoice is fully paid
-    const invoice = await Invoice.findByPk(validatedData.invoice_id, {
+    const invoice = await Invoice.findByPk(req.body.invoice_id, {
       include: [{ model: Payment, as: "payments" }],
     })
 
@@ -65,29 +63,22 @@ exports.createPayment = async (req, res) => {
 
     res.status(201).json(payment)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear pago", error: error.message })
   }
 }
 
 // Update payment
-exports.updatePayment = async (req, res) => {
+export const updatePayment = async (req, res) => {
   try {
-    const validatedData = paymentSchema.partial().parse(req.body)
     const payment = await Payment.findByPk(req.params.id)
 
     if (!payment) {
       return res.status(404).json({ message: "Pago no encontrado" })
     }
 
-    await payment.update(validatedData)
+    await payment.update(req.body)
     res.json(payment)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar pago", error: error.message })
   }
 }

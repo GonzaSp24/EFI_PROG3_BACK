@@ -1,9 +1,8 @@
-const { Part, Supplier, PartCompatibility, DeviceModel, InventoryMovement } = require("../index")
-const { partSchema } = require("../validators/inventory.validator")
-const { Op } = require("sequelize")
+import { Part, Supplier, PartCompatibility, DeviceModel, InventoryMovement } from "../src/models/index.js"
+import { Op } from "sequelize"
 
 // Get all parts with current stock
-exports.getAllParts = async (req, res) => {
+export const getAllParts = async (req, res) => {
   try {
     const { search, compatible_tipo, supplier_id, low_stock } = req.query
 
@@ -60,7 +59,7 @@ exports.getAllParts = async (req, res) => {
 }
 
 // Get part by ID with compatibility and stock
-exports.getPartById = async (req, res) => {
+export const getPartById = async (req, res) => {
   try {
     const part = await Part.findByPk(req.params.id, {
       include: [
@@ -108,41 +107,33 @@ exports.getPartById = async (req, res) => {
 }
 
 // Create part
-exports.createPart = async (req, res) => {
+export const createPart = async (req, res) => {
   try {
-    const validatedData = partSchema.parse(req.body)
-    const part = await Part.create(validatedData)
+    const part = await Part.create(req.body)
     res.status(201).json(part)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear parte", error: error.message })
   }
 }
 
 // Update part
-exports.updatePart = async (req, res) => {
+export const updatePart = async (req, res) => {
   try {
-    const validatedData = partSchema.partial().parse(req.body)
     const part = await Part.findByPk(req.params.id)
 
     if (!part) {
       return res.status(404).json({ message: "Parte no encontrada" })
     }
 
-    await part.update(validatedData)
+    await part.update(req.body)
     res.json(part)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar parte", error: error.message })
   }
 }
 
 // Delete part
-exports.deletePart = async (req, res) => {
+export const deletePart = async (req, res) => {
   try {
     const part = await Part.findByPk(req.params.id)
     if (!part) {

@@ -1,13 +1,13 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const {
+import { verifyToken } from "../middleware/auth.middleware.js"
+import {
   getAllInventoryMovements,
   getInventoryMovementById,
   createInventoryMovement,
   updateInventoryMovement,
   deleteInventoryMovement,
-} = require("../controllers/inventoryMovement.controller")
+} from "../controllers/inventoryMovement.controller.js"
 
 router.use(verifyToken)
 
@@ -17,4 +17,4 @@ router.post("/", createInventoryMovement)
 router.put("/:id", updateInventoryMovement)
 router.delete("/:id", deleteInventoryMovement)
 
-module.exports = router
+export default router

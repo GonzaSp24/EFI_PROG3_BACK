@@ -1,5 +1,4 @@
-const { Quote, RepairOrder, Customer, Device } = require("../index")
-const { quoteSchema } = require("../validators/billing.validator")
+import { Quote, RepairOrder, Customer, Device } from "../src/models/index.js"
 
 // Get all quotes
 exports.getAllQuotes = async (req, res) => {
@@ -55,35 +54,27 @@ exports.getQuoteById = async (req, res) => {
 }
 
 // Create quote
-exports.createQuote = async (req, res) => {
+export const createQuote = async (req, res) => {
   try {
-    const validatedData = quoteSchema.parse(req.body)
-    const quote = await Quote.create(validatedData)
+    const quote = await Quote.create(req.body)
     res.status(201).json(quote)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear cotización", error: error.message })
   }
 }
 
 // Update quote
-exports.updateQuote = async (req, res) => {
+export const updateQuote = async (req, res) => {
   try {
-    const validatedData = quoteSchema.partial().parse(req.body)
     const quote = await Quote.findByPk(req.params.id)
 
     if (!quote) {
       return res.status(404).json({ message: "Cotización no encontrada" })
     }
 
-    await quote.update(validatedData)
+    await quote.update(req.body)
     res.json(quote)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar cotización", error: error.message })
   }
 }

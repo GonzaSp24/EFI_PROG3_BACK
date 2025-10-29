@@ -1,8 +1,8 @@
-const bcrypt = require("bcrypt")
-const jwt = require("jsonwebtoken")
-const crypto = require("crypto")
-const { User, Role } = require("../index")
-const { sendEmail } = require("../utils/nodemailer")
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
+import crypto from "crypto"
+import { User, Role } from "../src/models/index.js"
+import { sendEmail } from "../utils/nodemailer.js"
 
 // In-memory store for reset tokens (consider using Redis in production)
 const resetTokens = new Map()
@@ -207,4 +207,4 @@ const resetPassword = async (req, res) => {
   }
 }
 
-module.exports = { register, login, forgotPassword, resetPassword }
+export { register, login, forgotPassword, resetPassword }

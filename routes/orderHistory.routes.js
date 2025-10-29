@@ -1,11 +1,7 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const {
-  getAllOrderHistory,
-  getOrderHistoryById,
-  createOrderHistory,
-} = require("../controllers/orderHistory.controller")
+import { verifyToken } from "../middleware/auth.middleware.js"
+import { getAllOrderHistory, getOrderHistoryById, createOrderHistory } from "../controllers/orderHistory.controller.js"
 
 router.use(verifyToken)
 
@@ -13,4 +9,4 @@ router.get("/", getAllOrderHistory)
 router.get("/:id", getOrderHistoryById)
 router.post("/", createOrderHistory)
 
-module.exports = router
+export default router

@@ -1,7 +1,7 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const { getAllQuotes, getQuoteById, createQuote, updateQuote, deleteQuote } = require("../controllers/quote.controller")
+import { verifyToken } from "../middleware/auth.middleware.js"
+import { getAllQuotes, getQuoteById, createQuote, updateQuote, deleteQuote } from "../controllers/quote.controller.js"
 
 router.use(verifyToken)
 
@@ -11,4 +11,4 @@ router.post("/", createQuote)
 router.put("/:id", updateQuote)
 router.delete("/:id", deleteQuote)
 
-module.exports = router
+export default router

@@ -1,12 +1,12 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const {
+import { verifyToken } from "../middleware/auth.middleware.js"
+import {
   getAllPartCompatibilities,
   getPartCompatibilityById,
   createPartCompatibility,
   deletePartCompatibility,
-} = require("../controllers/partCompatibility.controller")
+} from "../controllers/partCompatibility.controller.js"
 
 router.use(verifyToken)
 
@@ -15,4 +15,4 @@ router.get("/:id", getPartCompatibilityById)
 router.post("/", createPartCompatibility)
 router.delete("/:id", deletePartCompatibility)
 
-module.exports = router
+export default router

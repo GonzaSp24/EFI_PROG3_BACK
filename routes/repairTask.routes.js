@@ -1,13 +1,13 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const {
+import { verifyToken } from "../middleware/auth.middleware.js"
+import {
   getAllRepairTasks,
   getRepairTaskById,
   createRepairTask,
   updateRepairTask,
   deleteRepairTask,
-} = require("../controllers/repairTask.controller")
+} from "../controllers/repairTask.controller.js"
 
 router.use(verifyToken)
 
@@ -17,4 +17,4 @@ router.post("/", createRepairTask)
 router.put("/:id", updateRepairTask)
 router.delete("/:id", deleteRepairTask)
 
-module.exports = router
+export default router

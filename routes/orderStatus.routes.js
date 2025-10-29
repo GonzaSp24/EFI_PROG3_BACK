@@ -1,13 +1,13 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken, isAdmin } = require("../middleware/auth.middleware")
-const {
+import { verifyToken, isAdmin } from "../middleware/auth.middleware.js"
+import {
   getAllOrderStatuses,
   getOrderStatusById,
   createOrderStatus,
   updateOrderStatus,
   deleteOrderStatus,
-} = require("../controllers/orderStatus.controller")
+} from "../controllers/orderStatus.controller.js"
 
 // All routes require authentication
 router.use(verifyToken)
@@ -20,4 +20,4 @@ router.post("/", isAdmin, createOrderStatus)
 router.put("/:id", isAdmin, updateOrderStatus)
 router.delete("/:id", isAdmin, deleteOrderStatus)
 
-module.exports = router
+export default router

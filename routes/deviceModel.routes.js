@@ -1,13 +1,13 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const {
+import { verifyToken } from "../middleware/auth.middleware.js"
+import {
   getAllDeviceModels,
   getDeviceModelById,
   createDeviceModel,
   updateDeviceModel,
   deleteDeviceModel,
-} = require("../controllers/deviceModel.controller")
+} from "../controllers/deviceModel.controller.js"
 
 router.use(verifyToken)
 
@@ -17,4 +17,4 @@ router.post("/", createDeviceModel)
 router.put("/:id", updateDeviceModel)
 router.delete("/:id", deleteDeviceModel)
 
-module.exports = router
+export default router

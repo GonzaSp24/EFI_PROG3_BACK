@@ -1,8 +1,7 @@
-const { CustomerDevice, Customer, Device, Brand, DeviceModel } = require("../index")
-const { customerDeviceSchema } = require("../validators/device.validator")
+import { CustomerDevice, Customer, Device, Brand, DeviceModel } from "../src/models/index.js"
 
 // Get all customer-device relationships
-exports.getAllCustomerDevices = async (req, res) => {
+export const getAllCustomerDevices = async (req, res) => {
   try {
     const { customer_id, device_id, es_propietario_actual } = req.query
 
@@ -33,7 +32,7 @@ exports.getAllCustomerDevices = async (req, res) => {
 }
 
 // Get customer-device by ID
-exports.getCustomerDeviceById = async (req, res) => {
+export const getCustomerDeviceById = async (req, res) => {
   try {
     const customerDevice = await CustomerDevice.findByPk(req.params.id, {
       include: [
@@ -58,39 +57,31 @@ exports.getCustomerDeviceById = async (req, res) => {
 }
 
 // Create customer-device relationship
-exports.createCustomerDevice = async (req, res) => {
+export const createCustomerDevice = async (req, res) => {
   try {
-    const validatedData = customerDeviceSchema.parse(req.body)
-    const customerDevice = await CustomerDevice.create(validatedData)
+    const customerDevice = await CustomerDevice.create(req.body)
     res.status(201).json(customerDevice)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear relación", error: error.message })
   }
 }
 
 // Update customer-device relationship
-exports.updateCustomerDevice = async (req, res) => {
+export const updateCustomerDevice = async (req, res) => {
   try {
-    const validatedData = customerDeviceSchema.partial().parse(req.body)
     const customerDevice = await CustomerDevice.findByPk(req.params.id)
     if (!customerDevice) {
       return res.status(404).json({ message: "Relación no encontrada" })
     }
-    await customerDevice.update(validatedData)
+    await customerDevice.update(req.body)
     res.json(customerDevice)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar relación", error: error.message })
   }
 }
 
 // Delete customer-device relationship
-exports.deleteCustomerDevice = async (req, res) => {
+export const deleteCustomerDevice = async (req, res) => {
   try {
     const customerDevice = await CustomerDevice.findByPk(req.params.id)
     if (!customerDevice) {

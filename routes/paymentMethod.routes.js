@@ -1,13 +1,13 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken, isAdmin } = require("../middleware/auth.middleware")
-const {
+import { verifyToken, isAdmin } from "../middleware/auth.middleware.js"
+import {
   getAllPaymentMethods,
   getPaymentMethodById,
   createPaymentMethod,
   updatePaymentMethod,
   deletePaymentMethod,
-} = require("../controllers/paymentMethod.controller")
+} from "../controllers/paymentMethod.controller.js"
 
 // All routes require authentication
 router.use(verifyToken)
@@ -20,4 +20,4 @@ router.post("/", isAdmin, createPaymentMethod)
 router.put("/:id", isAdmin, updatePaymentMethod)
 router.delete("/:id", isAdmin, deletePaymentMethod)
 
-module.exports = router
+export default router

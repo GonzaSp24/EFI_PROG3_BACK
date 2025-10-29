@@ -1,7 +1,7 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const { getAllParts, getPartById, createPart, updatePart, deletePart } = require("../controllers/part.controller")
+import { verifyToken } from "../middleware/auth.middleware.js"
+import { getAllParts, getPartById, createPart, updatePart, deletePart } from "../controllers/part.controller.js"
 
 router.use(verifyToken)
 
@@ -11,4 +11,4 @@ router.post("/", createPart)
 router.put("/:id", updatePart)
 router.delete("/:id", deletePart)
 
-module.exports = router
+export default router

@@ -1,9 +1,8 @@
-const { Supplier, Part } = require("../index")
-const { supplierSchema } = require("../validators/inventory.validator")
-const { Op } = require("sequelize")
+import { Supplier, Part } from "../src/models/index.js"
+import { Op } from "sequelize"
 
 // Get all suppliers
-exports.getAllSuppliers = async (req, res) => {
+export const getAllSuppliers = async (req, res) => {
   try {
     const { search } = req.query
 
@@ -25,7 +24,7 @@ exports.getAllSuppliers = async (req, res) => {
 }
 
 // Get supplier by ID with parts
-exports.getSupplierById = async (req, res) => {
+export const getSupplierById = async (req, res) => {
   try {
     const supplier = await Supplier.findByPk(req.params.id, {
       include: [{ model: Part, as: "parts" }],
@@ -42,41 +41,33 @@ exports.getSupplierById = async (req, res) => {
 }
 
 // Create supplier
-exports.createSupplier = async (req, res) => {
+export const createSupplier = async (req, res) => {
   try {
-    const validatedData = supplierSchema.parse(req.body)
-    const supplier = await Supplier.create(validatedData)
+    const supplier = await Supplier.create(req.body)
     res.status(201).json(supplier)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear proveedor", error: error.message })
   }
 }
 
 // Update supplier
-exports.updateSupplier = async (req, res) => {
+export const updateSupplier = async (req, res) => {
   try {
-    const validatedData = supplierSchema.partial().parse(req.body)
     const supplier = await Supplier.findByPk(req.params.id)
 
     if (!supplier) {
       return res.status(404).json({ message: "Proveedor no encontrado" })
     }
 
-    await supplier.update(validatedData)
+    await supplier.update(req.body)
     res.json(supplier)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar proveedor", error: error.message })
   }
 }
 
 // Delete supplier
-exports.deleteSupplier = async (req, res) => {
+export const deleteSupplier = async (req, res) => {
   try {
     const supplier = await Supplier.findByPk(req.params.id)
     if (!supplier) {

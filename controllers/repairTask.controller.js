@@ -1,8 +1,7 @@
-const { RepairTask, User, RepairOrder } = require("../index")
-const { repairTaskSchema } = require("../validators/order.validator")
+import { RepairTask, User, RepairOrder } from "../src/models/index.js"
 
 // Get all repair tasks
-exports.getAllRepairTasks = async (req, res) => {
+export const getAllRepairTasks = async (req, res) => {
   try {
     const { order_id, estado, assigned_to } = req.query
 
@@ -30,7 +29,7 @@ exports.getAllRepairTasks = async (req, res) => {
 }
 
 // Get repair task by ID
-exports.getRepairTaskById = async (req, res) => {
+export const getRepairTaskById = async (req, res) => {
   try {
     const task = await RepairTask.findByPk(req.params.id, {
       include: [
@@ -50,41 +49,33 @@ exports.getRepairTaskById = async (req, res) => {
 }
 
 // Create repair task
-exports.createRepairTask = async (req, res) => {
+export const createRepairTask = async (req, res) => {
   try {
-    const validatedData = repairTaskSchema.parse(req.body)
-    const task = await RepairTask.create(validatedData)
+    const task = await RepairTask.create(req.body)
     res.status(201).json(task)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear tarea", error: error.message })
   }
 }
 
 // Update repair task
-exports.updateRepairTask = async (req, res) => {
+export const updateRepairTask = async (req, res) => {
   try {
-    const validatedData = repairTaskSchema.partial().parse(req.body)
     const task = await RepairTask.findByPk(req.params.id)
 
     if (!task) {
       return res.status(404).json({ message: "Tarea no encontrada" })
     }
 
-    await task.update(validatedData)
+    await task.update(req.body)
     res.json(task)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar tarea", error: error.message })
   }
 }
 
 // Delete repair task
-exports.deleteRepairTask = async (req, res) => {
+export const deleteRepairTask = async (req, res) => {
   try {
     const task = await RepairTask.findByPk(req.params.id)
     if (!task) {

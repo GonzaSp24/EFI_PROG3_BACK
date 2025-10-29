@@ -1,17 +1,17 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { register, login, forgotPassword, resetPassword } = require("../controllers/auth.controller")
-const {
+import { register, login, forgotPassword, resetPassword } from "../controllers/auth.controller.js"
+import {
   registerSchema,
   loginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
   validate,
-} = require("../validators/auth.validator")
+} from "../validators/auth.validator.js"
 
 router.post("/register", validate(registerSchema), register)
 router.post("/login", validate(loginSchema), login)
-router.post("/forgotPassword", validate(forgotPasswordSchema), forgotPassword)
-router.post("/resetPassword", validate(resetPasswordSchema), resetPassword)
+router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword)
+router.post("/reset-password", validate(resetPasswordSchema), resetPassword)
 
-module.exports = router
+export default router

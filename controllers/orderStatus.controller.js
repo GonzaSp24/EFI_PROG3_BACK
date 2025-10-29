@@ -1,8 +1,7 @@
-const { OrderStatus } = require("../index")
-const { orderStatusSchema } = require("../validators/catalog.validator")
+import { OrderStatus } from "../src/models/index.js"
 
 // Get all order statuses
-exports.getAllOrderStatuses = async (req, res) => {
+export const getAllOrderStatuses = async (req, res) => {
   try {
     const statuses = await OrderStatus.findAll({
       order: [["id", "ASC"]],
@@ -14,7 +13,7 @@ exports.getAllOrderStatuses = async (req, res) => {
 }
 
 // Get order status by ID
-exports.getOrderStatusById = async (req, res) => {
+export const getOrderStatusById = async (req, res) => {
   try {
     const status = await OrderStatus.findByPk(req.params.id)
     if (!status) {
@@ -27,39 +26,31 @@ exports.getOrderStatusById = async (req, res) => {
 }
 
 // Create order status
-exports.createOrderStatus = async (req, res) => {
+export const createOrderStatus = async (req, res) => {
   try {
-    const validatedData = orderStatusSchema.parse(req.body)
-    const status = await OrderStatus.create(validatedData)
+    const status = await OrderStatus.create(req.body)
     res.status(201).json(status)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear estado", error: error.message })
   }
 }
 
 // Update order status
-exports.updateOrderStatus = async (req, res) => {
+export const updateOrderStatus = async (req, res) => {
   try {
-    const validatedData = orderStatusSchema.parse(req.body)
     const status = await OrderStatus.findByPk(req.params.id)
     if (!status) {
       return res.status(404).json({ message: "Estado no encontrado" })
     }
-    await status.update(validatedData)
+    await status.update(req.body)
     res.json(status)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar estado", error: error.message })
   }
 }
 
 // Delete order status
-exports.deleteOrderStatus = async (req, res) => {
+export const deleteOrderStatus = async (req, res) => {
   try {
     const status = await OrderStatus.findByPk(req.params.id)
     if (!status) {

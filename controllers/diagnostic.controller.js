@@ -1,8 +1,7 @@
-const { Diagnostic, User, RepairOrder } = require("../index")
-const { diagnosticSchema } = require("../validators/order.validator")
+import { Diagnostic, User, RepairOrder } from "../src/models/index.js"
 
 // Get all diagnostics
-exports.getAllDiagnostics = async (req, res) => {
+export const getAllDiagnostics = async (req, res) => {
   try {
     const { order_id, tecnico_id, resultado } = req.query
 
@@ -27,7 +26,7 @@ exports.getAllDiagnostics = async (req, res) => {
 }
 
 // Get diagnostic by ID
-exports.getDiagnosticById = async (req, res) => {
+export const getDiagnosticById = async (req, res) => {
   try {
     const diagnostic = await Diagnostic.findByPk(req.params.id, {
       include: [
@@ -47,41 +46,33 @@ exports.getDiagnosticById = async (req, res) => {
 }
 
 // Create diagnostic
-exports.createDiagnostic = async (req, res) => {
+export const createDiagnostic = async (req, res) => {
   try {
-    const validatedData = diagnosticSchema.parse(req.body)
-    const diagnostic = await Diagnostic.create(validatedData)
+    const diagnostic = await Diagnostic.create(req.body)
     res.status(201).json(diagnostic)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear diagnóstico", error: error.message })
   }
 }
 
 // Update diagnostic
-exports.updateDiagnostic = async (req, res) => {
+export const updateDiagnostic = async (req, res) => {
   try {
-    const validatedData = diagnosticSchema.partial().parse(req.body)
     const diagnostic = await Diagnostic.findByPk(req.params.id)
 
     if (!diagnostic) {
       return res.status(404).json({ message: "Diagnóstico no encontrado" })
     }
 
-    await diagnostic.update(validatedData)
+    await diagnostic.update(req.body)
     res.json(diagnostic)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar diagnóstico", error: error.message })
   }
 }
 
 // Delete diagnostic
-exports.deleteDiagnostic = async (req, res) => {
+export const deleteDiagnostic = async (req, res) => {
   try {
     const diagnostic = await Diagnostic.findByPk(req.params.id)
     if (!diagnostic) {

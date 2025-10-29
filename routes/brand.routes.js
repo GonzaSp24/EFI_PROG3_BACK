@@ -1,7 +1,7 @@
-const express = require("express")
+import express from "express"
 const router = express.Router()
-const { verifyToken } = require("../middleware/auth.middleware")
-const { getAllBrands, getBrandById, createBrand, updateBrand, deleteBrand } = require("../controllers/brand.controller")
+import { verifyToken } from "../middleware/auth.middleware.js"
+import { getAllBrands, getBrandById, createBrand, updateBrand, deleteBrand } from "../controllers/brand.controller.js"
 
 router.use(verifyToken)
 
@@ -11,4 +11,4 @@ router.post("/", createBrand)
 router.put("/:id", updateBrand)
 router.delete("/:id", deleteBrand)
 
-module.exports = router
+export default router

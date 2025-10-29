@@ -1,9 +1,8 @@
-const { Device, Brand, DeviceModel, CustomerDevice, Customer } = require("../index")
-const { deviceSchema } = require("../validators/device.validator")
-const { Op } = require("sequelize")
+import { Device, Brand, DeviceModel, CustomerDevice, Customer } from "../src/models/index.js"
+import { Op } from "sequelize"
 
 // Get all devices
-exports.getAllDevices = async (req, res) => {
+export const getAllDevices = async (req, res) => {
   try {
     const { serial_number, brand_id } = req.query
 
@@ -26,7 +25,7 @@ exports.getAllDevices = async (req, res) => {
 }
 
 // Get device by ID
-exports.getDeviceById = async (req, res) => {
+export const getDeviceById = async (req, res) => {
   try {
     const device = await Device.findByPk(req.params.id, {
       include: [
@@ -44,7 +43,7 @@ exports.getDeviceById = async (req, res) => {
 }
 
 // Get device with owner history
-exports.getDeviceWithHistory = async (req, res) => {
+export const getDeviceWithHistory = async (req, res) => {
   try {
     const device = await Device.findByPk(req.params.id, {
       include: [
@@ -68,39 +67,31 @@ exports.getDeviceWithHistory = async (req, res) => {
 }
 
 // Create device
-exports.createDevice = async (req, res) => {
+export const createDevice = async (req, res) => {
   try {
-    const validatedData = deviceSchema.parse(req.body)
-    const device = await Device.create(validatedData)
+    const device = await Device.create(req.body)
     res.status(201).json(device)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear dispositivo", error: error.message })
   }
 }
 
 // Update device
-exports.updateDevice = async (req, res) => {
+export const updateDevice = async (req, res) => {
   try {
-    const validatedData = deviceSchema.partial().parse(req.body)
     const device = await Device.findByPk(req.params.id)
     if (!device) {
       return res.status(404).json({ message: "Dispositivo no encontrado" })
     }
-    await device.update(validatedData)
+    await device.update(req.body)
     res.json(device)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al actualizar dispositivo", error: error.message })
   }
 }
 
 // Delete device
-exports.deleteDevice = async (req, res) => {
+export const deleteDevice = async (req, res) => {
   try {
     const device = await Device.findByPk(req.params.id)
     if (!device) {

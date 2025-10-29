@@ -1,8 +1,7 @@
-const { OrderHistory, OrderStatus, User, RepairOrder } = require("../index")
-const { orderHistorySchema } = require("../validators/order.validator")
+import { OrderHistory, OrderStatus, User, RepairOrder } from "../src/models/index.js"
 
 // Get all history entries
-exports.getAllOrderHistory = async (req, res) => {
+export const getAllOrderHistory = async (req, res) => {
   try {
     const { order_id } = req.query
 
@@ -27,7 +26,7 @@ exports.getAllOrderHistory = async (req, res) => {
 }
 
 // Get history by ID
-exports.getOrderHistoryById = async (req, res) => {
+export const getOrderHistoryById = async (req, res) => {
   try {
     const history = await OrderHistory.findByPk(req.params.id, {
       include: [
@@ -49,15 +48,11 @@ exports.getOrderHistoryById = async (req, res) => {
 }
 
 // Create history entry
-exports.createOrderHistory = async (req, res) => {
+export const createOrderHistory = async (req, res) => {
   try {
-    const validatedData = orderHistorySchema.parse(req.body)
-    const history = await OrderHistory.create(validatedData)
+    const history = await OrderHistory.create(req.body)
     res.status(201).json(history)
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(400).json({ message: "Datos inválidos", errors: error.errors })
-    }
     res.status(500).json({ message: "Error al crear historial", error: error.message })
   }
 }
