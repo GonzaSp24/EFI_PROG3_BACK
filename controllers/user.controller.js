@@ -1,5 +1,5 @@
 import { User, Role } from "../src/models/index.js"
-import bcrypt from "bcrypt"
+import bcrypt from "bcryptjs"
 
 // Get all users
 export const getAllUsers = async (req, res) => {

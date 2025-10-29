@@ -1,7 +1,7 @@
 import { Quote, RepairOrder, Customer, Device } from "../src/models/index.js"
 
 // Get all quotes
-exports.getAllQuotes = async (req, res) => {
+export const getAllQuotes = async (req, res) => {
   try {
     const { order_id, estado } = req.query
 
@@ -28,7 +28,7 @@ exports.getAllQuotes = async (req, res) => {
 }
 
 // Get quote by ID
-exports.getQuoteById = async (req, res) => {
+export const getQuoteById = async (req, res) => {
   try {
     const quote = await Quote.findByPk(req.params.id, {
       include: [
@@ -80,7 +80,7 @@ export const updateQuote = async (req, res) => {
 }
 
 // Delete quote
-exports.deleteQuote = async (req, res) => {
+export const deleteQuote = async (req, res) => {
   try {
     const quote = await Quote.findByPk(req.params.id)
     if (!quote) {

@@ -1,7 +1,7 @@
 import { Payment, Invoice, PaymentMethod } from "../src/models/index.js"
 
 // Get all payments
-exports.getAllPayments = async (req, res) => {
+export const getAllPayments = async (req, res) => {
   try {
     const { invoice_id, metodo_id } = req.query
 
@@ -25,7 +25,7 @@ exports.getAllPayments = async (req, res) => {
 }
 
 // Get payment by ID
-exports.getPaymentById = async (req, res) => {
+export const getPaymentById = async (req, res) => {
   try {
     const payment = await Payment.findByPk(req.params.id, {
       include: [
@@ -84,7 +84,7 @@ export const updatePayment = async (req, res) => {
 }
 
 // Delete payment
-exports.deletePayment = async (req, res) => {
+export const deletePayment = async (req, res) => {
   try {
     const payment = await Payment.findByPk(req.params.id)
     if (!payment) {
