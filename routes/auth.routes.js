@@ -11,7 +11,7 @@ const {
 
 router.post("/register", validate(registerSchema), register)
 router.post("/login", validate(loginSchema), login)
-router.post("/forgot-password", validate(forgotPasswordSchema), forgotPassword)
-router.post("/reset-password", validate(resetPasswordSchema), resetPassword)
+router.post("/forgotPassword", validate(forgotPasswordSchema), forgotPassword)
+router.post("/resetPassword", validate(resetPasswordSchema), resetPassword)
 
 module.exports = router

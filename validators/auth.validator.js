@@ -1,5 +1,5 @@
 const { body } = require("express-validator")
-const { validate } = require("../middleware/validation.middleware")
+const { validate } = require("../middlewares/validation.middleware")
 
 const registerSchema = [
     body("name")
