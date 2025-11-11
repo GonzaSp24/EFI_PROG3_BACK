@@ -10,14 +10,16 @@ import {
   deleteSolicitud,
 } from "../controllers/solicitud.controller.js"
 
-// Todas las rutas requieren autenticación
+// 🔹 Cualquiera puede crear una solicitud (sin token)
+router.post("/", createSolicitud)
+
+// 🔒 Desde acá, todas las demás rutas sí requieren autenticación
 router.use(verifyToken)
 
 router.get("/", getAllSolicitudes)
 router.get("/:id", getSolicitudById)
 
-// Solo los administradores pueden crear, actualizar o eliminar
-router.post("/", isAdmin, createSolicitud)
+// 🔐 Solo los administradores pueden modificar o eliminar
 router.put("/:id", isAdmin, updateSolicitud)
 router.delete("/:id", isAdmin, deleteSolicitud)
 
