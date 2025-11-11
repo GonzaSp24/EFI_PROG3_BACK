@@ -166,7 +166,139 @@ const seedDatabase = async () => {
         )
         console.log(`✅ Created ${suppliers.length} suppliers`)
         
-        // 9. Seed Parts
+        // 9. Seed Devices
+        console.log("📝 Seeding devices...")
+        const iphone13Model = await models.DeviceModel.findOne({ where: { name: "iPhone 13" } })
+        const galaxyS23Model = await models.DeviceModel.findOne({ where: { name: "Galaxy S23" } })
+        
+        const devices = await models.Device.bulkCreate(
+            [
+                {
+                    brand_id: appleBrand.id,
+                    device_model_id: iphone13Model.id,
+                    serial_number: "IP13-2024-001",
+                    physical_state: "bueno",
+                },
+                {
+                    brand_id: appleBrand.id,
+                    device_model_id: iphone13Model.id,
+                    serial_number: "IP13-2024-002",
+                    physical_state: "rayado",
+                },
+                {
+                    brand_id: samsungBrand.id,
+                    device_model_id: galaxyS23Model.id,
+                    serial_number: "S23-2024-001",
+                    physical_state: "bueno",
+                },
+                {
+                    brand_id: samsungBrand.id,
+                    device_model_id: galaxyS23Model.id,
+                    serial_number: "S23-2024-002",
+                    physical_state: "golpeado",
+                },
+            ],
+            { ignoreDuplicates: true },
+        )
+        console.log(`✅ Created ${devices.length} devices`)
+        
+        // 10. Seed Customer Devices (linking customers with their devices)
+        console.log("📝 Seeding customer devices...")
+        const customer1 = customers[0]
+        const customer2 = customers[1]
+        const device1 = devices[0]
+        const device2 = devices[2]
+        
+        const customerDevices = await models.CustomerDevice.bulkCreate(
+            [
+                {
+                    customer_id: customer1.id,
+                    device_id: device1.id,
+                    nickname: "Mi iPhone",
+                },
+                {
+                    customer_id: customer2.id,
+                    device_id: device2.id,
+                    nickname: "Samsung Principal",
+                },
+            ],
+            { ignoreDuplicates: true },
+        )
+        console.log(`✅ Created ${customerDevices.length} customer devices`)
+        
+        // 11. Seed Repair Orders
+        console.log("📝 Seeding repair orders...")
+        const estadoRecibida = await models.OrderStatus.findOne({ where: { code: "recibida" } })
+        const estadoDiagnostico = await models.OrderStatus.findOne({ where: { code: "diagnostico" } })
+        const tecnico = users[1]
+        
+        const repairOrders = await models.RepairOrder.bulkCreate(
+            [
+                {
+                    customer_id: customer1.id,
+                    device_id: device1.id,
+                    tecnico_id: tecnico.id,
+                    estado_id: estadoDiagnostico.id,
+                    problema_reportado: "Pantalla rota",
+                    prioridad: "alta",
+                    fecha_ingreso: new Date(),
+                    fecha_estimada: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+                },
+                {
+                    customer_id: customer2.id,
+                    device_id: device2.id,
+                    tecnico_id: tecnico.id,
+                    estado_id: estadoRecibida.id,
+                    problema_reportado: "No enciende",
+                    prioridad: "media",
+                    fecha_ingreso: new Date(),
+                    fecha_estimada: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days from now
+                },
+            ],
+            { ignoreDuplicates: true },
+        )
+        console.log(`✅ Created ${repairOrders.length} repair orders`)
+        
+        // 12. Seed Repair Tasks
+        console.log("📝 Seeding repair tasks...")
+        const order1 = repairOrders[0]
+        const order2 = repairOrders[1]
+        
+        const repairTasks = await models.RepairTask.bulkCreate(
+            [
+                {
+                    order_id: order1.id,
+                    titulo: "Revisar pantalla",
+                    descripcion: "Inspeccionar daños en la pantalla",
+                    estado: "completado",
+                    assigned_to: tecnico.id,
+                    tiempo_invertido_min: 30,
+                    position: 1,
+                },
+                {
+                    order_id: order1.id,
+                    titulo: "Reemplazar pantalla",
+                    descripcion: "Instalar nueva pantalla OLED",
+                    estado: "en_progreso",
+                    assigned_to: tecnico.id,
+                    tiempo_invertido_min: 45,
+                    position: 2,
+                },
+                {
+                    order_id: order2.id,
+                    titulo: "Diagnóstico inicial",
+                    descripcion: "Revisar por qué no enciende el dispositivo",
+                    estado: "pendiente",
+                    assigned_to: tecnico.id,
+                    tiempo_invertido_min: 0,
+                    position: 1,
+                },
+            ],
+            { ignoreDuplicates: true },
+        )
+        console.log(`✅ Created ${repairTasks.length} repair tasks`)
+        
+        // 13. Seed Parts
         console.log("📝 Seeding parts...")
         const supplier1 = await models.Supplier.findOne({ where: { name: "Repuestos Tech SA" } })
         
@@ -217,6 +349,10 @@ const seedDatabase = async () => {
         console.log(`   - Device Models: ${deviceModels.length}`)
         console.log(`   - Customers: ${customers.length}`)
         console.log(`   - Suppliers: ${suppliers.length}`)
+        console.log(`   - Devices: ${devices.length}`)
+        console.log(`   - Customer Devices: ${customerDevices.length}`)
+        console.log(`   - Repair Orders: ${repairOrders.length}`)
+        console.log(`   - Repair Tasks: ${repairTasks.length}`)
         console.log(`   - Parts: ${parts.length}`)
         console.log("\n🔐 Test credentials:")
         console.log("   Email: admin@techfix.com")

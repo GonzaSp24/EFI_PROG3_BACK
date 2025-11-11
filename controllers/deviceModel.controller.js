@@ -5,19 +5,22 @@ const { DeviceModel, Brand } = models
 // Get all device models
 export const getAllDeviceModels = async (req, res) => {
   try {
+    console.log("[v0] getAllDeviceModels called with query:", req.query)
     const { brand_id, device_type } = req.query
-
+    
     const whereClause = {}
     if (brand_id) whereClause.brand_id = brand_id
     if (device_type) whereClause.device_type = device_type
-
+    
     const deviceModels = await DeviceModel.findAll({
       where: whereClause,
-      include: [{ model: Brand, as: "brand" }],
+      include: [{ model: Brand }],
       order: [["name", "ASC"]],
     })
+    console.log("[v0] Device models found:", deviceModels.length)
     res.json(deviceModels)
   } catch (error) {
+    console.error("[v0] Error in getAllDeviceModels:", error)
     res.status(500).json({ message: "Error al obtener modelos", error: error.message })
   }
 }

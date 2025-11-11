@@ -1,32 +1,31 @@
-import { CustomerDevice, Customer, Device, Brand, DeviceModel } from "../src/models/index.js"
+import { Brand, Customer, CustomerDevice, Device, DeviceModel } from "../src/models/index.js"
 
 // Get all customer-device relationships
 export const getAllCustomerDevices = async (req, res) => {
   try {
+    console.log("[v0] getAllCustomerDevices called")
     const { customer_id, device_id, es_propietario_actual } = req.query
-
+    
     const whereClause = {}
     if (customer_id) whereClause.customer_id = customer_id
     if (device_id) whereClause.device_id = device_id
     if (es_propietario_actual !== undefined) whereClause.es_propietario_actual = es_propietario_actual === "true"
-
+    
     const customerDevices = await CustomerDevice.findAll({
       where: whereClause,
       include: [
-        { model: Customer, as: "customer" },
+        { model: Customer },
         {
           model: Device,
-          as: "device",
-          include: [
-            { model: Brand, as: "brand" },
-            { model: DeviceModel, as: "device_model" },
-          ],
+          include: [{ model: Brand }, { model: DeviceModel }],
         },
       ],
       order: [["fecha_alta", "DESC"]],
     })
+    console.log("[v0] Customer devices fetched:", customerDevices.length)
     res.json(customerDevices)
   } catch (error) {
+    console.error("[v0] Error in getAllCustomerDevices:", error)
     res.status(500).json({ message: "Error al obtener relaciones cliente-dispositivo", error: error.message })
   }
 }
@@ -36,14 +35,10 @@ export const getCustomerDeviceById = async (req, res) => {
   try {
     const customerDevice = await CustomerDevice.findByPk(req.params.id, {
       include: [
-        { model: Customer, as: "customer" },
+        { model: Customer },
         {
           model: Device,
-          as: "device",
-          include: [
-            { model: Brand, as: "brand" },
-            { model: DeviceModel, as: "device_model" },
-          ],
+          include: [{ model: Brand }, { model: DeviceModel }],
         },
       ],
     })

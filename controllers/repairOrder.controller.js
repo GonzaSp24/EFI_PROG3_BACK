@@ -1,17 +1,20 @@
 import {
-  RepairOrder,
+  Brand,
   Customer,
   Device,
-  User,
-  OrderStatus,
-  OrderHistory,
-  RepairTask,
+  DeviceModel,
   Diagnostic,
+  OrderHistory,
+  OrderStatus,
+  RepairOrder,
+  RepairTask,
+  User,
 } from "../src/models/index.js"
 
 // Get all repair orders
 export const getAllRepairOrders = async (req, res) => {
   try {
+    console.log("[v0] getAllRepairOrders called")
     const { customer_id, estado_id, prioridad, tecnico_id } = req.query
 
     const whereClause = { deleted_at: null }
@@ -23,16 +26,21 @@ export const getAllRepairOrders = async (req, res) => {
     const orders = await RepairOrder.findAll({
       where: whereClause,
       include: [
-        { model: Customer, as: "customer" },
-        { model: Device, as: "device", include: ["brand", "device_model"] },
-        { model: User, as: "assigned_to" },
-        { model: OrderStatus, as: "status" },
+        { model: Customer },
+        {
+          model: Device,
+          include: [{ model: Brand }, { model: DeviceModel }],
+        },
+        { model: User, as: "tecnico" },
+        { model: OrderStatus },
       ],
       order: [["fecha_recibido", "DESC"]],
     })
 
+    console.log("[v0] Repair orders fetched:", orders.length)
     res.json(orders)
   } catch (error) {
+    console.error("[v0] Error in getAllRepairOrders:", error)
     res.status(500).json({ message: "Error al obtener órdenes", error: error.message })
   }
 }
@@ -46,9 +54,12 @@ export const getOrdersByCustomer = async (req, res) => {
         deleted_at: null,
       },
       include: [
-        { model: Device, as: "device", include: ["brand", "device_model"] },
-        { model: User, as: "assigned_to" },
-        { model: OrderStatus, as: "status" },
+        {
+          model: Device,
+          include: [{ model: Brand }, { model: DeviceModel }],
+        },
+        { model: User, as: "tecnico" },
+        { model: OrderStatus },
       ],
       order: [["fecha_recibido", "DESC"]],
     })
@@ -64,29 +75,29 @@ export const getRepairOrderById = async (req, res) => {
   try {
     const order = await RepairOrder.findByPk(req.params.id, {
       include: [
-        { model: Customer, as: "customer" },
-        { model: Device, as: "device", include: ["brand", "device_model"] },
-        { model: User, as: "assigned_to" },
-        { model: OrderStatus, as: "status" },
+        { model: Customer },
+        {
+          model: Device,
+          include: [{ model: Brand }, { model: DeviceModel }],
+        },
+        { model: User, as: "tecnico" },
+        { model: OrderStatus },
         {
           model: OrderHistory,
-          as: "history",
           include: [
-            { model: OrderStatus, as: "previous_status" },
-            { model: OrderStatus, as: "new_status" },
-            { model: User, as: "changed_by" },
+            { model: OrderStatus, as: "estadoAnterior" },
+            { model: OrderStatus, as: "estadoNuevo" },
+            { model: User, as: "autor" },
           ],
           order: [["created_at", "DESC"]],
         },
         {
           model: RepairTask,
-          as: "tasks",
-          include: [{ model: User, as: "assigned_user" }],
+          include: [{ model: User, as: "asignado" }],
         },
         {
           model: Diagnostic,
-          as: "diagnostics",
-          include: [{ model: User, as: "technician" }],
+          include: [{ model: User, as: "diagnostico_por" }],
         },
       ],
     })
@@ -97,6 +108,7 @@ export const getRepairOrderById = async (req, res) => {
 
     res.json(order)
   } catch (error) {
+    console.error("[v0] Error in getRepairOrderById:", error)
     res.status(500).json({ message: "Error al obtener orden", error: error.message })
   }
 }
@@ -104,6 +116,7 @@ export const getRepairOrderById = async (req, res) => {
 // Create repair order
 export const createRepairOrder = async (req, res) => {
   try {
+    console.log("[v0] Creating repair order with data:", req.body)
     const order = await RepairOrder.create(req.body)
 
     // Create initial history entry
@@ -117,6 +130,7 @@ export const createRepairOrder = async (req, res) => {
 
     res.status(201).json(order)
   } catch (error) {
+    console.error("[v0] Error creating repair order:", error)
     res.status(500).json({ message: "Error al crear orden", error: error.message })
   }
 }

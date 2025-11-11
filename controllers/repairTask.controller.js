@@ -1,4 +1,4 @@
-import { RepairTask, User, RepairOrder } from "../src/models/index.js"
+import { RepairOrder, RepairTask, User } from "../src/models/index.js"
 
 // Get all repair tasks
 export const getAllRepairTasks = async (req, res) => {
@@ -12,10 +12,7 @@ export const getAllRepairTasks = async (req, res) => {
 
     const tasks = await RepairTask.findAll({
       where: whereClause,
-      include: [
-        { model: RepairOrder, as: "order" },
-        { model: User, as: "assigned_user" },
-      ],
+      include: [{ model: RepairOrder }, { model: User, as: "asignado" }],
       order: [
         ["order_id", "ASC"],
         ["position", "ASC"],
@@ -24,6 +21,7 @@ export const getAllRepairTasks = async (req, res) => {
 
     res.json(tasks)
   } catch (error) {
+    console.error("[v0] Error in getAllRepairTasks:", error)
     res.status(500).json({ message: "Error al obtener tareas", error: error.message })
   }
 }
@@ -32,10 +30,7 @@ export const getAllRepairTasks = async (req, res) => {
 export const getRepairTaskById = async (req, res) => {
   try {
     const task = await RepairTask.findByPk(req.params.id, {
-      include: [
-        { model: RepairOrder, as: "order" },
-        { model: User, as: "assigned_user" },
-      ],
+      include: [{ model: RepairOrder }, { model: User, as: "asignado" }],
     })
 
     if (!task) {

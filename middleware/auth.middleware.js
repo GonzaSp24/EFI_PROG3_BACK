@@ -1,5 +1,6 @@
+import { Role, User } from "../src/models/index.js"
+
 import jwt from "jsonwebtoken"
-import { User, Role } from "../src/models/index.js"
 
 /**
  * Middleware to verify JWT token
@@ -33,7 +34,7 @@ const verifyToken = async (req, res, next) => {
 
     // Optionally fetch fresh user data from database
     const user = await User.findByPk(req.user.id, {
-      include: [{ model: Role, as: "role" }],
+      include: [{ model: Role, as: "Role" }],
       attributes: { exclude: ["password_hash"] },
     })
 
@@ -55,7 +56,7 @@ const verifyToken = async (req, res, next) => {
       name: user.name,
       email: user.email,
       role_id: user.role_id,
-      rol: user.role?.name || "cliente",
+      rol: user.Role?.name || "cliente",
     }
 
     next()
