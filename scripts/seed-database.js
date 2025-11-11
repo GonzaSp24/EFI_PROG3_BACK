@@ -59,7 +59,7 @@ const seedDatabase = async () => {
             [
                 {
                     email: "admin@techfix.com",
-                    password: hashedPassword,
+                    password_hash: hashedPassword,
                     first_name: "Admin",
                     last_name: "TechFix",
                     phone: "1234567890",
@@ -68,7 +68,7 @@ const seedDatabase = async () => {
                 },
                 {
                     email: "tecnico@techfix.com",
-                    password: hashedPassword,
+                    password_hash: hashedPassword,
                     first_name: "Juan",
                     last_name: "Pérez",
                     phone: "0987654321",

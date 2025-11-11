@@ -1,7 +1,8 @@
+import { Role, User } from "../src/models/index.js"
+
 import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
 import crypto from "crypto"
-import { User, Role } from "../src/models/index.js"
+import jwt from "jsonwebtoken"
 import { sendEmail } from "../utils/nodemailer.js"
 
 // In-memory store for reset tokens (consider using Redis in production)
@@ -26,20 +27,20 @@ const resetEmailTemplate = ({ nombre, resetUrl }) => {
 
 const register = async (req, res) => {
   const { name, email, password, role_id } = req.body
-
+  
   try {
     // Check if user already exists
     const userExist = await User.findOne({ where: { email } })
     if (userExist) {
       return res.status(400).json({ message: "El usuario ya existe" })
     }
-
+    
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
-
+    
     // Get default role if not provided (assuming role_id 3 is 'cliente')
     const finalRoleId = role_id || 3
-
+    
     // Create user
     const newUser = await User.create({
       name,
@@ -48,13 +49,13 @@ const register = async (req, res) => {
       role_id: finalRoleId,
       is_active: true,
     })
-
+    
     // Get user with role
     const userWithRole = await User.findByPk(newUser.id, {
-      include: [{ model: Role, as: "role" }],
+      include: [{ model: Role }],
       attributes: { exclude: ["password_hash"] },
     })
-
+    
     res.status(201).json({
       message: "Usuario registrado exitosamente",
       data: userWithRole,
@@ -71,48 +72,59 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body
-
+  
+  console.log("[v0] Login attempt for email:", email)
+  
   try {
-    // Find user with role
     const userExist = await User.findOne({
       where: { email },
-      include: [{ model: Role, as: "role" }],
+      include: [{ model: Role }],
     })
-
+    
+    console.log("[v0] User found:", userExist ? "Yes" : "No")
+    
     if (!userExist) {
+      console.log("[v0] User not found in database")
       return res.status(400).json({ message: "Usuario no encontrado" })
     }
-
+    
     // Check if user is active
     if (!userExist.is_active) {
+      console.log("[v0] User is inactive")
       return res.status(403).json({ message: "Usuario inactivo" })
     }
-
+    
     // Validate password
+    console.log("[v0] Validating password...")
     const validPassword = await bcrypt.compare(password, userExist.password_hash)
+    console.log("[v0] Password valid:", validPassword)
+    
     if (!validPassword) {
       return res.status(403).json({ message: "Contraseña incorrecta" })
     }
-
-    // Prepare user data for token
+    
     const user = {
       id: userExist.id,
       name: userExist.name,
       email: userExist.email,
-      rol: userExist.role?.name || "cliente",
+      rol: userExist.Role?.nombre || "cliente",
       role_id: userExist.role_id,
     }
-
+    
+    console.log("[v0] Generating JWT token for user:", user.id)
+    
     // Generate JWT token
     const token = jwt.sign({ user }, process.env.JWT_SECRET || "supersecreto123", { expiresIn: "8h" })
-
+    
+    console.log("[v0] Login successful for user:", user.email)
+    
     res.json({
       message: "Inicio de sesión exitoso",
       token,
       user,
     })
   } catch (error) {
-    console.error("[Login Error]", error)
+    console.error("[v0] Login Error:", error)
     res.status(500).json({
       status: 500,
       message: "Error al iniciar sesión",
@@ -123,31 +135,31 @@ const login = async (req, res) => {
 
 const forgotPassword = async (req, res) => {
   const { email } = req.body
-
+  
   try {
     const user = await User.findOne({ where: { email } })
     if (!user) {
       return res.status(400).json({ message: "El usuario no existe" })
     }
-
+    
     // Generate reset token
     const rawToken = crypto.randomBytes(32).toString("hex")
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex")
     const expiresAt = Date.now() + 15 * 60 * 1000 // 15 minutes
-
+    
     // Store token
     resetTokens.set(user.id, { tokenHash, expiresAt })
-
-    // Create reset URL
-    const resetUrl = `${process.env.FRONT_URL || "http://localhost:3000"}/recuperar-contraseña?token=${rawToken}&id=${user.id}`
-
+    
+    // Update URL del frontend para reset password (puerto 5173 de Vite)
+    const resetUrl = `${process.env.FRONT_URL || "http://localhost:5173"}/recuperar-contraseña?token=${rawToken}&id=${user.id}`
+    
     // Send email
     await sendEmail({
       to: user.email,
       subject: "Recuperar contraseña - TechFix",
       html: resetEmailTemplate({ nombre: user.name, resetUrl }),
     })
-
+    
     res.json({ message: "Email de recuperación enviado exitosamente" })
   } catch (error) {
     console.error("[Forgot Password Error]", error)
@@ -160,43 +172,43 @@ const forgotPassword = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   const { id, token, password } = req.body
-
+  
   if (!id || !token || !password) {
     return res.status(400).json({ message: "Faltan datos" })
   }
-
+  
   try {
     // Get stored token
     const entry = resetTokens.get(Number(id))
     if (!entry) {
       return res.status(400).json({ message: "Token inválido o expirado" })
     }
-
+    
     // Check expiration
     if (entry.expiresAt < Date.now()) {
       resetTokens.delete(Number(id))
       return res.status(400).json({ message: "Token expirado" })
     }
-
+    
     // Verify token
     const tokenHash = crypto.createHash("sha256").update(token).digest("hex")
     if (tokenHash !== entry.tokenHash) {
       return res.status(400).json({ message: "Token inválido" })
     }
-
+    
     // Find user
     const user = await User.findByPk(id)
     if (!user) {
       return res.status(400).json({ message: "El usuario no existe" })
     }
-
+    
     // Update password
     user.password_hash = await bcrypt.hash(password, 10)
     await user.save()
-
+    
     // Delete used token
     resetTokens.delete(Number(id))
-
+    
     return res.status(200).json({ message: "Contraseña actualizada exitosamente" })
   } catch (error) {
     console.error("[Reset Password Error]", error)
