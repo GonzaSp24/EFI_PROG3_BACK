@@ -53,11 +53,11 @@ const initServer = async () => {
         const quoteRoutes = (await import("../routes/quote.routes.js")).default
         const repairOrderRoutes = (await import("../routes/repairOrder.routes.js")).default
         const repairTaskRoutes = (await import("../routes/repairTask.routes.js")).default
-        const solicitudRoutes = (await import("../routes/request.routes.js")).default
         const roleRoutes = (await import("../routes/role.routes.js")).default
         const supplierRoutes = (await import("../routes/supplier.routes.js")).default
         const testChecklistItemRoutes = (await import("../routes/testChecklistItem.routes.js")).default
         const userRoutes = (await import("../routes/user.routes.js")).default
+        const requestRoutes = (await import("../routes/request.routes.js")).default
         
         app.get("/", (req, res) => {
             res.json({
@@ -89,11 +89,11 @@ const initServer = async () => {
         app.use("/api/quotes", quoteRoutes)
         app.use("/api/repair-orders", repairOrderRoutes)
         app.use("/api/repair-tasks", repairTaskRoutes)
-        app.use("/api/request", solicitudRoutes)
         app.use("/api/roles", roleRoutes)
         app.use("/api/suppliers", supplierRoutes)
         app.use("/api/test-checklist-items", testChecklistItemRoutes)
         app.use("/api/users", userRoutes)
+        app.use("/api/solicitudes", requestRoutes)
         
         // 404 handler
         app.use((req, res) => {

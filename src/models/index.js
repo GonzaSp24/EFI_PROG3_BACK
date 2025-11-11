@@ -21,10 +21,9 @@ import QuoteItem from "./billing/QuoteItem.js"
 // Orders
 import RepairOrder from "./orders/RepairOrder.js"
 import RepairTask from "./orders/RepairTask.js"
+import Request from "./requests/Request.js"
 // Catalogs
 import Role from "./catalogs/Role.js"
-// Requests
-import Request from "./requests/Request.js"
 // Inventory
 import Supplier from "./inventory/Supplier.js"
 import TestChecklistItem from "./orders/TestChecklistItem.js"
@@ -114,6 +113,8 @@ export {
     DeviceModel,
     Device,
     CustomerDevice,
+    // Requests
+    Request,
     // Orders
     RepairOrder,
     OrderHistory,
