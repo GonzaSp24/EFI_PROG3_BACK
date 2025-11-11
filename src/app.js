@@ -58,6 +58,17 @@ const initServer = async () => {
         const testChecklistItemRoutes = (await import("../routes/testChecklistItem.routes.js")).default
         const userRoutes = (await import("../routes/user.routes.js")).default
         
+        app.get("/", (req, res) => {
+            res.json({
+                message: "TechFix API",
+                version: "1.0.0",
+                endpoints: {
+                    health: "/health",
+                    api: "/api/*",
+                },
+            })
+        })
+        
         // API Routes
         app.use("/api/auth", authRoutes)
         app.use("/api/brands", brandRoutes)

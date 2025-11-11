@@ -1,5 +1,7 @@
 // Script para poblar la base de datos con datos iniciales
-require("dotenv").config()
+import "dotenv/config"
+
+import bcrypt from "bcryptjs"
 
 const seedDatabase = async () => {
     try {
@@ -7,7 +9,6 @@ const seedDatabase = async () => {
         
         // Import models
         const { models, sequelize } = await import("../src/models/index.js")
-        const bcrypt = require("bcryptjs")
         
         // 1. Seed Roles
         console.log("📝 Seeding roles...")
@@ -120,22 +121,19 @@ const seedDatabase = async () => {
         const customers = await models.Customer.bulkCreate(
             [
                 {
-                    first_name: "María",
-                    last_name: "González",
+                    name: "María González",
                     email: "maria@example.com",
                     phone: "1122334455",
                     address: "Av. Siempre Viva 123",
                 },
                 {
-                    first_name: "Carlos",
-                    last_name: "Rodríguez",
+                    name: "Carlos Rodríguez",
                     email: "carlos@example.com",
                     phone: "5544332211",
                     address: "Calle Falsa 456",
                 },
                 {
-                    first_name: "Ana",
-                    last_name: "Martínez",
+                    name: "Ana Martínez",
                     email: "ana@example.com",
                     phone: "9988776655",
                     address: "Boulevard Principal 789",
@@ -175,33 +173,33 @@ const seedDatabase = async () => {
         const parts = await models.Part.bulkCreate(
             [
                 {
-                    name: "Pantalla iPhone 13",
-                    description: "Pantalla OLED original",
                     sku: "SCR-IP13-001",
-                    cost_price: 15000,
-                    sale_price: 25000,
-                    stock_quantity: 10,
-                    min_stock_level: 2,
+                    name: "Pantalla iPhone 13",
+                    description: "Pantalla OLED original para iPhone 13",
+                    purchase_price: 15000,
+                    selling_price: 25000,
+                    current_stock: 10,
+                    minimum_stock: 2,
                     supplier_id: supplier1.id,
                 },
                 {
-                    name: "Batería iPhone 13",
-                    description: "Batería de litio 3095mAh",
                     sku: "BAT-IP13-001",
-                    cost_price: 8000,
-                    sale_price: 15000,
-                    stock_quantity: 15,
-                    min_stock_level: 3,
+                    name: "Batería iPhone 13",
+                    description: "Batería de alta capacidad para iPhone 13",
+                    purchase_price: 8000,
+                    selling_price: 15000,
+                    current_stock: 15,
+                    minimum_stock: 3,
                     supplier_id: supplier1.id,
                 },
                 {
+                    sku: "SCR-S23-001",
                     name: "Pantalla Samsung S23",
-                    description: "Pantalla AMOLED original",
-                    sku: "SCR-SS23-001",
-                    cost_price: 18000,
-                    sale_price: 30000,
-                    stock_quantity: 8,
-                    min_stock_level: 2,
+                    description: "Pantalla AMOLED para Samsung Galaxy S23",
+                    purchase_price: 18000,
+                    selling_price: 30000,
+                    current_stock: 8,
+                    minimum_stock: 2,
                     supplier_id: supplier1.id,
                 },
             ],
@@ -209,7 +207,7 @@ const seedDatabase = async () => {
         )
         console.log(`✅ Created ${parts.length} parts`)
         
-        console.log("🎉 Database seeding completed successfully!")
+        console.log("\n🎉 Database seeding completed successfully!")
         console.log("\n📊 Summary:")
         console.log(`   - Roles: ${roles.length}`)
         console.log(`   - Order Statuses: ${statuses.length}`)
