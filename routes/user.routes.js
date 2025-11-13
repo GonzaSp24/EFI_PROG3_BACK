@@ -8,10 +8,13 @@ import {
   updateUser,
   deleteUser,
   toggleUserStatus,
+  getUserProfile,
 } from "../controllers/user.controller.js"
 
 // All routes require authentication
 router.use(verifyToken)
+
+router.get("/profile", getUserProfile)
 
 router.get("/", getAllUsers)
 router.get("/:id", getUserById)

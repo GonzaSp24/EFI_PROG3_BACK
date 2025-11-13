@@ -1,6 +1,23 @@
 import { User, Role } from "../src/models/index.js"
 import bcrypt from "bcryptjs"
 
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      include: [{ model: Role, as: "role" }],
+      attributes: { exclude: ["password_hash"] },
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuario no encontrado" })
+    }
+
+    res.json(user)
+  } catch (error) {
+    res.status(500).json({ message: "Error al obtener perfil", error: error.message })
+  }
+}
+
 // Get all users
 export const getAllUsers = async (req, res) => {
   try {
