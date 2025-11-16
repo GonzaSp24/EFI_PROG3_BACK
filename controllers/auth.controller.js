@@ -73,7 +73,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body
 
-  console.log("[v0] Login attempt for email:", email)
+  console.log("Login attempt for email:", email)
 
   try {
     const userExist = await User.findOne({
@@ -81,23 +81,23 @@ const login = async (req, res) => {
       include: [{ model: Role }],
     })
 
-    console.log("[v0] User found:", userExist ? "Yes" : "No")
+    console.log("User found:", userExist ? "Yes" : "No")
 
     if (!userExist) {
-      console.log("[v0] User not found in database")
+      console.log("User not found in database")
       return res.status(400).json({ message: "Usuario no encontrado" })
     }
 
     // Check if user is active
     if (!userExist.is_active) {
-      console.log("[v0] User is inactive")
+      console.log("User is inactive")
       return res.status(403).json({ message: "Usuario inactivo" })
     }
 
     // Validate password
-    console.log("[v0] Validating password...")
+    console.log("Validating password...")
     const validPassword = await bcrypt.compare(password, userExist.password_hash)
-    console.log("[v0] Password valid:", validPassword)
+    console.log("Password valid:", validPassword)
 
     if (!validPassword) {
       return res.status(403).json({ message: "Contraseña incorrecta" })
@@ -111,12 +111,12 @@ const login = async (req, res) => {
       role_id: userExist.role_id,
     }
 
-    console.log("[v0] Generating JWT token for user:", user.id)
+    console.log("Generating JWT token for user:", user.id)
 
     // Generate JWT token
     const token = jwt.sign({ user }, process.env.JWT_SECRET || "supersecreto123", { expiresIn: "8h" })
 
-    console.log("[v0] Login successful for user:", user.email)
+    console.log("Login successful for user:", user.email)
 
     res.json({
       message: "Inicio de sesión exitoso",
@@ -124,7 +124,7 @@ const login = async (req, res) => {
       user,
     })
   } catch (error) {
-    console.error("[v0] Login Error:", error)
+    console.error("Login Error:", error)
     res.status(500).json({
       status: 500,
       message: "Error al iniciar sesión",
@@ -136,33 +136,33 @@ const login = async (req, res) => {
 const forgotPassword = async (req, res) => {
   const { email } = req.body
 
-  console.log("[v0] forgotPassword called with email:", email)
+  console.log("forgotPassword called with email:", email)
 
   try {
-    console.log("[v0] Looking up user in database...")
+    console.log("Looking up user in database...")
     const user = await User.findOne({ where: { email } })
-    console.log("[v0] User found:", user ? `${user.name} (${user.email})` : "No user found")
+    console.log("User found:", user ? `${user.name} (${user.email})` : "No user found")
 
     if (!user) {
-      console.log("[v0] User does not exist, returning 400")
+      console.log("User does not exist, returning 400")
       return res.status(400).json({ message: "El usuario no existe" })
     }
 
-    console.log("[v0] Generating reset token...")
+    console.log("Generating reset token...")
     const rawToken = crypto.randomBytes(32).toString("hex")
     const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex")
     const expiresAt = Date.now() + 15 * 60 * 1000 // 15 minutes
 
-    console.log("[v0] Storing token in memory for user ID:", user.id)
+    console.log("Storing token in memory for user ID:", user.id)
     resetTokens.set(user.id, { tokenHash, expiresAt })
 
-    const resetUrl = `${process.env.FRONT_URL || "http://localhost:5173"}/recuperar-contraseña?token=${rawToken}&id=${user.id}`
-    console.log("[v0] Reset URL generated:", resetUrl)
+    const resetUrl = `${process.env.FRONT_URL || "http://localhost:5173"}/reset-password?token=${rawToken}&id=${user.id}`
+    console.log("Reset URL generated:", resetUrl)
 
-    console.log("[v0] Attempting to send email to:", user.email)
-    console.log("[v0] MAIL_FROM env var:", process.env.MAIL_FROM)
-    console.log("[v0] SMTP_HOST:", process.env.SMTP_HOST)
-    console.log("[v0] SMTP_PORT:", process.env.SMTP_PORT)
+    console.log("Attempting to send email to:", user.email)
+    console.log("MAIL_FROM env var:", process.env.MAIL_FROM)
+    console.log("SMTP_HOST:", process.env.SMTP_HOST)
+    console.log("SMTP_PORT:", process.env.SMTP_PORT)
 
     await sendEmail({
       to: user.email,
@@ -171,11 +171,11 @@ const forgotPassword = async (req, res) => {
       from: process.env.MAIL_FROM,
     })
 
-    console.log("[v0] Email sent successfully!")
+    console.log("Email sent successfully!")
     res.json({ message: "Email de recuperación enviado exitosamente" })
   } catch (error) {
-    console.error("[v0] forgotPassword ERROR:", error.message)
-    console.error("[v0] Error stack:", error.stack)
+    console.error("forgotPassword ERROR:", error.message)
+    console.error("Error stack:", error.stack)
     return res.status(500).json({
       message: "Error al enviar el email",
       error: error.message,

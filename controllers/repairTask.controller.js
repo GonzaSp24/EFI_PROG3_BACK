@@ -25,7 +25,7 @@ export const getAllRepairTasks = async (req, res) => {
 
     res.json(tasks)
   } catch (error) {
-    console.error("[v0] Error in getAllRepairTasks:", error)
+    console.error("Error in getAllRepairTasks:", error)
     res.status(500).json({ message: "Error al obtener tareas", error: error.message })
   }
 }

@@ -5,7 +5,7 @@ import { Op } from "sequelize"
 // Get all devices
 export const getAllDevices = async (req, res) => {
   try {
-    console.log("[v0] getAllDevices called")
+    console.log("getAllDevices called")
     const { serial_number, brand_id } = req.query
     
     const whereClause = {}
@@ -22,10 +22,10 @@ export const getAllDevices = async (req, res) => {
       ],
       order: [["id", "DESC"]],
     })
-    console.log("[v0] Devices fetched:", devices.length)
+    console.log("Devices fetched:", devices.length)
     res.json(devices)
   } catch (error) {
-    console.error("[v0] Error in getAllDevices:", error)
+    console.error("Error in getAllDevices:", error)
     res.status(500).json({ message: "Error al obtener dispositivos", error: error.message })
   }
 }
@@ -78,7 +78,7 @@ export const getDeviceWithHistory = async (req, res) => {
 // Create device
 export const createDevice = async (req, res) => {
   try {
-    console.log("[v0] Creating device with data:", req.body)
+    console.log("Creating device with data:", req.body)
     const device = await Device.create(req.body)
     
     const createdDevice = await Device.findByPk(device.id, {
@@ -90,10 +90,10 @@ export const createDevice = async (req, res) => {
       ],
     })
     
-    console.log("[v0] Device created successfully:", createdDevice.id)
+    console.log("Device created successfully:", createdDevice.id)
     res.status(201).json(createdDevice)
   } catch (error) {
-    console.error("[v0] Error creating device:", error)
+    console.error("Error creating device:", error)
     res.status(500).json({ message: "Error al crear dispositivo", error: error.message })
   }
 }
@@ -101,8 +101,8 @@ export const createDevice = async (req, res) => {
 // Update device
 export const updateDevice = async (req, res) => {
   try {
-    console.log("[v0] updateDevice called with id:", req.params.id)
-    console.log("[v0] Update data:", req.body)
+    console.log("updateDevice called with id:", req.params.id)
+    console.log("Update data:", req.body)
     
     const device = await Device.findByPk(req.params.id)
     if (!device) {
@@ -120,10 +120,10 @@ export const updateDevice = async (req, res) => {
       ],
     })
     
-    console.log("[v0] Device updated successfully:", updatedDevice.id)
+    console.log("Device updated successfully:", updatedDevice.id)
     res.json(updatedDevice)
   } catch (error) {
-    console.error("[v0] Error updating device:", error)
+    console.error("Error updating device:", error)
     res.status(500).json({ message: "Error al actualizar dispositivo", error: error.message })
   }
 }

@@ -14,7 +14,7 @@ import {
 // Get all repair orders
 export const getAllRepairOrders = async (req, res) => {
   try {
-    console.log("[v0] getAllRepairOrders called")
+    console.log("getAllRepairOrders called")
     const { customer_id, estado_id, prioridad, tecnico_id } = req.query
 
     const whereClause = { deleted_at: null }
@@ -37,10 +37,10 @@ export const getAllRepairOrders = async (req, res) => {
       order: [["fecha_recibido", "DESC"]],
     })
 
-    console.log("[v0] Repair orders fetched:", orders.length)
+    console.log("Repair orders fetched:", orders.length)
     res.json(orders)
   } catch (error) {
-    console.error("[v0] Error in getAllRepairOrders:", error)
+    console.error("Error in getAllRepairOrders:", error)
     res.status(500).json({ message: "Error al obtener órdenes", error: error.message })
   }
 }
@@ -108,7 +108,7 @@ export const getRepairOrderById = async (req, res) => {
 
     res.json(order)
   } catch (error) {
-    console.error("[v0] Error in getRepairOrderById:", error)
+    console.error("Error in getRepairOrderById:", error)
     res.status(500).json({ message: "Error al obtener orden", error: error.message })
   }
 }
@@ -116,7 +116,7 @@ export const getRepairOrderById = async (req, res) => {
 // Create repair order
 export const createRepairOrder = async (req, res) => {
   try {
-    console.log("[v0] Creating repair order with data:", req.body)
+    console.log("Creating repair order with data:", req.body)
     const order = await RepairOrder.create(req.body)
 
     // Create initial history entry
@@ -130,7 +130,7 @@ export const createRepairOrder = async (req, res) => {
 
     res.status(201).json(order)
   } catch (error) {
-    console.error("[v0] Error creating repair order:", error)
+    console.error("Error creating repair order:", error)
     res.status(500).json({ message: "Error al crear orden", error: error.message })
   }
 }

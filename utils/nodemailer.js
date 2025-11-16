@@ -19,12 +19,12 @@ export const sendEmail = async ({ to, subject, html, from }) => {
       html,
     }
 
-    console.log("[v0] Sending email with from:", mailOptions.from)
+    console.log("Sending email with from:", mailOptions.from)
     const info = await transporter.sendMail(mailOptions)
-    console.log("[v0] Email sent successfully:", info.messageId)
+    console.log("Email sent successfully:", info.messageId)
     return info
   } catch (error) {
-    console.error("[v0] Error sending email:", error.message)
+    console.error("Error sending email:", error.message)
     throw error
   }
 }

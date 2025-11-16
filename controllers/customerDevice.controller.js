@@ -3,7 +3,7 @@ import { Brand, Customer, CustomerDevice, Device, DeviceModel } from "../src/mod
 // Get all customer-device relationships
 export const getAllCustomerDevices = async (req, res) => {
   try {
-    console.log("[v0] getAllCustomerDevices called")
+    console.log("getAllCustomerDevices called")
     const { customer_id, device_id, es_propietario_actual } = req.query
     
     const whereClause = {}
@@ -22,10 +22,10 @@ export const getAllCustomerDevices = async (req, res) => {
       ],
       order: [["fecha_alta", "DESC"]],
     })
-    console.log("[v0] Customer devices fetched:", customerDevices.length)
+    console.log("Customer devices fetched:", customerDevices.length)
     res.json(customerDevices)
   } catch (error) {
-    console.error("[v0] Error in getAllCustomerDevices:", error)
+    console.error("Error in getAllCustomerDevices:", error)
     res.status(500).json({ message: "Error al obtener relaciones cliente-dispositivo", error: error.message })
   }
 }
