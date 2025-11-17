@@ -27,8 +27,8 @@ export function applyAssociations() {
     User.belongsTo(Role, { foreignKey: "role_id" });
     
     // Users / Customers
-    Customer.belongsTo(User, { foreignKey: "user_id" });
-    User.hasOne(Customer, { foreignKey: "user_id" });
+    Customer.belongsTo(User, { foreignKey: "user_id", as: "user" }); 
+    User.hasOne(Customer, { foreignKey: "user_id", as: "customer_profile" });
     
     // Devices
     DeviceModel.belongsTo(Brand, { foreignKey: "brand_id" });
