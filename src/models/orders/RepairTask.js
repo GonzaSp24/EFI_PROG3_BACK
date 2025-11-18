@@ -10,6 +10,8 @@ const RepairTask = sequelize.define("RepairTask", {
     tiempo_invertido_min: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
     assigned_to: { type: DataTypes.BIGINT, allowNull: true }, // FK → users.id
     position: { type: DataTypes.INTEGER, allowNull: true },
+    fecha_inicio: { type: DataTypes.DATE, allowNull: true },
+    fecha_fin: { type: DataTypes.DATE, allowNull: true },
 }, {
     tableName: "repair_tasks",
     timestamps: true,

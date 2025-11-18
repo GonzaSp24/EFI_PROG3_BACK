@@ -29,7 +29,12 @@ export const getAllRepairOrders = async (req, res) => {
         { model: Customer },
         {
           model: Device,
-          include: [{ model: Brand }, { model: DeviceModel }],
+          include: [
+            {
+              model: DeviceModel,
+              include: [{ model: Brand }],
+            },
+          ],
         },
         { model: User, as: "tecnico" },
         { model: OrderStatus },
@@ -56,7 +61,12 @@ export const getOrdersByCustomer = async (req, res) => {
       include: [
         {
           model: Device,
-          include: [{ model: Brand }, { model: DeviceModel }],
+          include: [
+            {
+              model: DeviceModel,
+              include: [{ model: Brand }],
+            },
+          ],
         },
         { model: User, as: "tecnico" },
         { model: OrderStatus },
@@ -78,7 +88,12 @@ export const getRepairOrderById = async (req, res) => {
         { model: Customer },
         {
           model: Device,
-          include: [{ model: Brand }, { model: DeviceModel }],
+          include: [
+            {
+              model: DeviceModel,
+              include: [{ model: Brand }],
+            },
+          ],
         },
         { model: User, as: "tecnico" },
         { model: OrderStatus },
@@ -138,23 +153,23 @@ export const createRepairOrder = async (req, res) => {
 // Update repair order
 export const updateRepairOrder = async (req, res) => {
   try {
-    console.log("[v0] updateRepairOrder - Order ID:", req.params.id)
-    console.log("[v0] updateRepairOrder - Update data:", req.body)
-    console.log("[v0] updateRepairOrder - User:", req.user ? req.user.id : "NO USER")
+    console.log("updateRepairOrder - Order ID:", req.params.id)
+    console.log("updateRepairOrder - Update data:", req.body)
+    console.log("updateRepairOrder - User:", req.user ? req.user.id : "NO USER")
     
     const order = await RepairOrder.findByPk(req.params.id)
 
     if (!order) {
-      console.error("[v0] Order not found:", req.params.id)
+      console.error("Order not found:", req.params.id)
       return res.status(404).json({ message: "Orden no encontrada" })
     }
 
-    console.log("[v0] Current order state:", order.toJSON())
+    console.log("Current order state:", order.toJSON())
 
     if (req.body.estado_id && parseInt(req.body.estado_id) !== parseInt(order.estado_id)) {
       if (req.user && req.user.id) {
         try {
-          console.log("[v0] Creating order history - estado_anterior:", order.estado_id, "estado_nuevo:", req.body.estado_id)
+          console.log("Creating order history - estado_anterior:", order.estado_id, "estado_nuevo:", req.body.estado_id)
           const historyEntry = await OrderHistory.create({
             order_id: order.id,
             estado_anterior: order.estado_id,
@@ -162,35 +177,40 @@ export const updateRepairOrder = async (req, res) => {
             cambiado_por: req.user.id,
             comentario: req.body.comentario || "Estado actualizado",
           })
-          console.log("[v0] Order history created:", historyEntry.id)
+          console.log("Order history created:", historyEntry.id)
         } catch (historyError) {
-          console.error("[v0] Error creating order history:", historyError.message)
+          console.error("Error creating order history:", historyError.message)
         }
       } else {
-        console.warn("[v0] Skipping history creation - no user info available")
+        console.warn("Skipping history creation - no user info available")
       }
     }
 
     await order.update(req.body)
-    console.log("[v0] Order updated successfully")
+    console.log("Order updated successfully")
     
     const updatedOrder = await RepairOrder.findByPk(order.id, {
       include: [
         { model: Customer },
         {
           model: Device,
-          include: [{ model: Brand }, { model: DeviceModel }],
+          include: [
+            {
+              model: DeviceModel,
+              include: [{ model: Brand }],
+            },
+          ],
         },
         { model: User, as: "tecnico" },
         { model: OrderStatus },
       ],
     })
     
-    console.log("[v0] Returning updated order")
+    console.log("Returning updated order")
     res.json(updatedOrder)
   } catch (error) {
-    console.error("[v0] ERROR in updateRepairOrder:", error.message)
-    console.error("[v0] Error stack:", error.stack)
+    console.error("ERROR in updateRepairOrder:", error.message)
+    console.error("Error stack:", error.stack)
     res.status(500).json({ 
       message: "Error al actualizar orden", 
       error: error.message,

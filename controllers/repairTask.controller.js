@@ -1,4 +1,12 @@
-import { RepairOrder, RepairTask, User } from "../src/models/index.js"
+import { 
+  Brand,
+  Customer,
+  Device,
+  DeviceModel,
+  RepairOrder,
+  RepairTask,
+  User,
+} from "../src/models/index.js"
 
 // Get all repair tasks
 export const getAllRepairTasks = async (req, res) => {
@@ -16,7 +24,25 @@ export const getAllRepairTasks = async (req, res) => {
 
     const tasks = await RepairTask.findAll({
       where: whereClause,
-      include: [{ model: RepairOrder }, { model: User, as: "asignado" }],
+      include: [
+        {
+          model: RepairOrder,
+          include: [
+            { model: Customer },
+            {
+              model: Device,
+              include: [
+                {
+                  model: DeviceModel,
+                  include: [{ model: Brand }],
+                },
+              ],
+            },
+            { model: User, as: "tecnico" },
+          ],
+        },
+        { model: User, as: "asignado" },
+      ],
       order: [
         ["order_id", "ASC"],
         ["position", "ASC"],
@@ -34,7 +60,25 @@ export const getAllRepairTasks = async (req, res) => {
 export const getRepairTaskById = async (req, res) => {
   try {
     const task = await RepairTask.findByPk(req.params.id, {
-      include: [{ model: RepairOrder }, { model: User, as: "asignado" }],
+      include: [
+        {
+          model: RepairOrder,
+          include: [
+            { model: Customer },
+            {
+              model: Device,
+              include: [
+                {
+                  model: DeviceModel,
+                  include: [{ model: Brand }],
+                },
+              ],
+            },
+            { model: User, as: "tecnico" },
+          ],
+        },
+        { model: User, as: "asignado" },
+      ],
     })
 
     if (!task) {
