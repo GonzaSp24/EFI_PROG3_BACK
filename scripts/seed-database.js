@@ -12,7 +12,7 @@ const seedDatabase = async () => {
         
         // 1. Seed Roles
         console.log("📝 Seeding roles...")
-        const roles = await models.Role.bulkCreate([{ code: "admin" }, { code: "tecnico" }, { code: "recepcionista" }], {
+        const roles = await models.Role.bulkCreate([{ code: "admin" }, { code: "tecnico" }, { code: "cliente" }], {
             ignoreDuplicates: true,
         })
         console.log(`✅ Created ${roles.length} roles`)

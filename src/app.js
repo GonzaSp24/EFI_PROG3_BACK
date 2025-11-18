@@ -2,19 +2,42 @@ import "dotenv/config"
 
 import cors from "cors"
 import express from "express"
+import swaggerUi from "swagger-ui-express"
+import { swaggerSpec } from "../config/swagger.js"
 
 const app = express()
 const PORT = process.env.PORT || 3000
 
+const allowedOrigins = [
+    process.env.FRONT_URL || "http://localhost:5173", // Front
+    `http://localhost:${PORT}` // Backe para Swagger
+];
+
 // Middleware
 app.use(
     cors({
-        origin: process.env.FRONT_URL || "http://localhost:5173",
+        origin: function (origin, callback) {
+            // peticiones 
+            if (!origin) {
+                return callback(null, true);
+            }
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                return callback(null, true);
+            }
+            return callback(new Error("CORS policy violation"), false);
+        },
         credentials: true,
     }),
 )
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+
+// Swagger documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { 
+    swaggerOptions: {
+        persistAuthorization: true,
+    }
+}))
 
 // Health check (available before DB initialization)
 app.get("/health", (req, res) => {
@@ -66,6 +89,7 @@ const initServer = async () => {
                 endpoints: {
                     health: "/health",
                     api: "/api/*",
+                    docs: "/api-docs",
                 },
             })
         })
@@ -113,6 +137,7 @@ const initServer = async () => {
             console.log(`🚀 Server running on port ${PORT}`)
             console.log(`📍 API available at http://localhost:${PORT}`)
             console.log(`🏥 Health check: http://localhost:${PORT}/health`)
+            console.log(`📚 Swagger docs at http://localhost:${PORT}/api-docs`)
         })
     } catch (error) {
         console.error("❌ Failed to start server:", error)
