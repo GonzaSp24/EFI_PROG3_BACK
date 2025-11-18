@@ -52,7 +52,7 @@ const register = async (req, res) => {
 
     // Get user with role
     const userWithRole = await User.findByPk(newUser.id, {
-      include: [{ model: Role }],
+      include: [{ model: Role, as: "role" }],
       attributes: { exclude: ["password_hash"] },
     })
 
@@ -78,7 +78,7 @@ const login = async (req, res) => {
   try {
     const userExist = await User.findOne({
       where: { email },
-      include: [{ model: Role }],
+      include: [{ model: Role, as: "role" }],
     })
 
     console.log("User found:", userExist ? "Yes" : "No")

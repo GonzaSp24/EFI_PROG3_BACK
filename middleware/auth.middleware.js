@@ -34,7 +34,7 @@ const verifyToken = async (req, res, next) => {
 
     // Optionally fetch fresh user data from database
     const user = await User.findByPk(req.user.id, {
-      include: [{ model: Role, as: "Role" }],
+      include: [{ model: Role, as: "role" }],
       attributes: { exclude: ["password_hash"] },
     })
 

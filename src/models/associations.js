@@ -24,7 +24,7 @@ import User from "./users/User.js";
 
 export function applyAssociations() {
     // Catálogos
-    User.belongsTo(Role, { foreignKey: "role_id" });
+    User.belongsTo(Role, { foreignKey: "role_id", as: "role" });
     
     // Users / Customers
     Customer.belongsTo(User, { foreignKey: "user_id", as: "user" }); 
