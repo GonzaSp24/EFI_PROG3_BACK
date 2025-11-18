@@ -30,7 +30,7 @@ const swaggerDefinition = {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        description: 'JWT token from login endpoint',
+        description: 'Ingrese su token JWT aquí',
       },
     },
     schemas: {
